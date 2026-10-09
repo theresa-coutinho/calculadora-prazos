@@ -1,0 +1,948 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calculadora de Prazos BFMM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:wght@500&display=swap">
+<style>
+/* Layout: ficha de conferência. Formulário à esquerda, resultado e minuta à direita; repositório de atos abaixo. Tokens BFMM (manual 2021). */
+:root {
+  --bg: #F4F5F6;          /* silver.50 */
+  --surface: #FFFFFF;
+  --surface-2: #EEF2F8;   /* manzi.50 */
+  --text: #0C203D;        /* manzi.900 */
+  --text-2: #52575B;      /* silver.600 */
+  --text-3: #70787E;      /* silver.500 */
+  --border: #C8CCCF;      /* silver.200 */
+  --border-soft: #E4E6E8; /* silver.100 */
+  --brand: #1D3D6F;       /* manzi.600 */
+  --brand-hover: #18345F; /* manzi.700 */
+  --brand-ink: #FFFFFF;
+  --mark: #D6DFEC;        /* manzi.100 */
+  --weekend: #E4E6E8;
+  --font-display: "Lora", Georgia, "Times New Roman", serif;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 6px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #252B30; --surface: #333C42; --surface-2: #2C3E58;
+    --text: #F4F5F6; --text-2: #C8CCCF; --text-3: #ABB1B6;
+    --border: #52575B; --border-soft: #414549;
+    --brand: #85A0C5; --brand-hover: #ADC0D9; --brand-ink: #0C203D;
+    --mark: #18345F; --weekend: #414549;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #252B30; --surface: #333C42; --surface-2: #2C3E58;
+  --text: #F4F5F6; --text-2: #C8CCCF; --text-3: #ABB1B6;
+  --border: #52575B; --border-soft: #414549;
+  --brand: #85A0C5; --brand-hover: #ADC0D9; --brand-ink: #0C203D;
+  --mark: #18345F; --weekend: #414549;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--text); font: 15px/1.6 var(--font-body); }
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 16px; padding-block: 24px 64px; }
+
+header.top { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+header.top img { height: 44px; width: auto; }
+.logo-dark { display: none; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .logo-light { display: none; } :root:not([data-theme="light"]) .logo-dark { display: block; } }
+:root[data-theme="dark"] .logo-light { display: none; }
+:root[data-theme="dark"] .logo-dark { display: block; }
+header.top .t { min-width: 0; }
+h1 { font: 500 26px/1.2 var(--font-display); letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
+header.top p { margin: 2px 0 0; color: var(--text-2); font-size: 13px; }
+
+.aviso { margin-top: 16px; padding: 10px 14px; border: 1px solid var(--border); border-left: 3px solid var(--brand); background: var(--surface); border-radius: var(--radius); font-size: 13px; color: var(--text-2); }
+.aviso strong { color: var(--text); }
+
+.grid { display: grid; grid-template-columns: minmax(0, 400px) minmax(0, 1fr); gap: 24px; margin-top: 24px; align-items: start; }
+@media (max-width: 900px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+
+.panel { background: var(--surface); border: 1px solid var(--border-soft); border-radius: var(--radius); padding: 20px; min-width: 0; }
+.panel + .panel { margin-top: 0; }
+.col { display: grid; gap: 24px; min-width: 0; }
+h2 { font: 500 19px/1.3 var(--font-display); letter-spacing: -0.02em; margin: 0 0 14px; }
+h3 { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); margin: 0 0 8px; }
+
+.step { display: grid; gap: 8px; padding-block: 14px; border-top: 1px solid var(--border-soft); }
+.step:first-of-type { border-top: 0; padding-top: 0; }
+label, .lbl { font-size: 13px; font-weight: 500; color: var(--text-2); }
+.hint { font-size: 12px; color: var(--text-3); margin: 0; }
+input[type=date], input[type=text], input[type=number], select {
+  font: inherit; font-size: 14px; color: var(--text); background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 10px; width: 100%; min-width: 0;
+}
+input:focus-visible, select:focus-visible, button:focus-visible, .seg input:focus-visible + span, summary:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.row2 > div { display: grid; gap: 4px; min-width: 0; }
+@media (max-width: 420px) { .row2 { grid-template-columns: 1fr; } }
+
+.seg { display: flex; flex-wrap: wrap; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.seg label { flex: 1 1 0; min-width: 0; margin: 0; cursor: pointer; }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg span { display: block; text-align: center; padding: 8px 6px; font-size: 13px; font-weight: 500; color: var(--text-2); background: var(--surface); border-left: 1px solid var(--border); }
+.seg label:first-child span { border-left: 0; }
+.seg input:checked + span { background: var(--brand); color: var(--brand-ink); }
+
+.check { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; color: var(--text-2); cursor: pointer; }
+.check input { margin-top: 3px; accent-color: var(--brand); }
+
+button { font: inherit; font-size: 14px; font-weight: 500; border-radius: var(--radius); padding: 9px 16px; cursor: pointer; border: 1px solid var(--brand); }
+.btn-primary { background: var(--brand); color: var(--brand-ink); }
+.btn-primary:hover { background: var(--brand-hover); border-color: var(--brand-hover); }
+.btn-ghost { background: transparent; color: var(--brand); }
+.btn-ghost:hover { background: var(--surface-2); }
+.btn-small { padding: 4px 10px; font-size: 12px; }
+button[disabled] { opacity: .5; cursor: not-allowed; }
+
+.indisp-item { display: grid; gap: 8px; padding: 12px; border: 1px solid var(--border-soft); border-radius: var(--radius); background: var(--bg); }
+.indisp-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+
+/* Resultado */
+.datas { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: var(--border-soft); border: 1px solid var(--border-soft); border-radius: var(--radius); overflow: hidden; }
+.datas div { background: var(--surface); padding: 12px 14px; min-width: 0; }
+.datas .k { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); }
+.datas .v { font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.datas .d { font-size: 12px; color: var(--text-2); }
+.datas .final { background: var(--surface-2); }
+.datas .final .v { color: var(--brand); font-size: 20px; }
+.msgs { display: grid; gap: 6px; margin-top: 12px; }
+.msg { font-size: 13px; padding: 8px 12px; border-radius: var(--radius); background: var(--bg); border: 1px solid var(--border-soft); color: var(--text-2); }
+.msg.alerta { border-left: 3px solid var(--brand); color: var(--text); }
+
+details.tl { margin-top: 16px; }
+details.tl summary { cursor: pointer; font-size: 13px; font-weight: 500; color: var(--brand); }
+.tl-wrap { overflow-x: auto; margin-top: 10px; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th { text-align: left; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--text-3); font-weight: 600; padding: 6px 8px; border-bottom: 1px solid var(--border); }
+td { padding: 6px 8px; border-bottom: 1px solid var(--border-soft); vertical-align: top; }
+td.num, td.dt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+tr.fds td { background: var(--weekend); color: var(--text-3); }
+tr.susp td { background: var(--surface-2); }
+tr.marco td { font-weight: 600; }
+tr.parc td { background: var(--surface-2); font-style: italic; }
+tr.fim td { background: var(--mark); font-weight: 600; }
+
+.minuta-box { white-space: pre-wrap; font-size: 14px; line-height: 1.7; padding: 16px; border: 1px solid var(--border-soft); border-radius: var(--radius); background: var(--bg); text-align: justify; hyphens: auto; }
+.minuta-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.ok { font-size: 13px; color: var(--text-2); }
+.docs { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 14px; }
+.docs > div { display: grid; gap: 4px; min-width: 0; }
+
+/* Repositório */
+section.repo { margin-top: 32px; }
+.repo-bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; margin-bottom: 14px; }
+.repo-bar > div { display: grid; gap: 4px; min-width: 140px; }
+.repo-form { display: grid; gap: 12px; padding: 16px; border: 1px solid var(--border-soft); border-radius: var(--radius); background: var(--bg); margin-top: 16px; }
+.repo-form .fgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+.repo-form .fgrid > div { display: grid; gap: 4px; min-width: 0; }
+.chip { display: inline-block; font-size: 11px; font-weight: 600; padding: 1px 8px; border-radius: 99px; background: var(--surface-2); color: var(--text-2); white-space: nowrap; }
+.vazio { padding: 20px; text-align: center; color: var(--text-2); font-size: 14px; border: 1px dashed var(--border); border-radius: var(--radius); }
+.acts { display: flex; gap: 6px; flex-wrap: nowrap; }
+footer.nota { margin-top: 32px; font-size: 12px; color: var(--text-3); max-width: 75ch; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <img class="logo-light" alt="Batista, Fazio, Manzi e Milet Advogados" src="assets/logo-azul.png">
+    <img class="logo-dark" alt="Batista, Fazio, Manzi e Milet Advogados" src="assets/logo-branco.png">
+    <div class="t">
+      <h1>Calculadora de Prazos</h1>
+      <p>Conferência de prazos processuais e minuta do tópico de tempestividade</p>
+    </div>
+  </header>
+
+  <div class="aviso" id="statusRepo"><strong>Carregando o repositório de atos.</strong></div>
+
+  <div class="grid">
+    <!-- FORMULÁRIO -->
+    <form class="panel" id="form" autocomplete="off">
+      <h2>Dados do prazo</h2>
+
+      <div class="step">
+        <span class="lbl">1. Tipo de comunicação</span>
+        <div class="seg" role="radiogroup" aria-label="Tipo de comunicação">
+          <label><input type="radio" name="via" id="via-djen" value="djen" checked><span>DJEN</span></label>
+          <label><input type="radio" name="via" id="via-cit" value="citacao"><span>Citação</span></label>
+        </div>
+        <div class="seg" id="citGroup" role="radiogroup" aria-label="Forma da citação" hidden>
+          <label><input type="radio" name="cit" id="cit-dom" value="domicilio" checked><span>Domicílio Judicial Eletrônico</span></label>
+          <label><input type="radio" name="cit" id="cit-mand" value="mandado"><span>Juntada do mandado</span></label>
+          <label><input type="radio" name="cit" id="cit-aud" value="audiencia"><span>Data da audiência</span></label>
+        </div>
+      </div>
+
+      <div class="step">
+        <span class="lbl">2. Data do evento</span>
+        <div class="row2" id="datasDjen">
+          <div><label for="dDisp">Disponibilização</label><input type="date" id="dDisp"></div>
+          <div><label for="dPub">Publicação</label><input type="date" id="dPub"></div>
+        </div>
+        <p class="hint" id="hintDjen">Preencha uma das duas. Informada a disponibilização, a publicação é o 1º dia útil seguinte.</p>
+        <div id="datasCit" hidden>
+          <label for="dCit" id="lblCit">Data da ciência no Domicílio Judicial Eletrônico</label>
+          <input type="date" id="dCit">
+        </div>
+      </div>
+
+      <div class="step">
+        <span class="lbl">3. Peça</span>
+        <select id="peca" aria-label="Peça"></select>
+        <div class="row2">
+          <div><label for="dias">Prazo (dias úteis)</label><input type="number" id="dias" min="1" max="120"></div>
+          <div><span class="lbl">Fundamento</span><span id="lei" class="hint" style="padding-top:8px"></span></div>
+        </div>
+      </div>
+
+      <div class="step">
+        <span class="lbl">4. Local</span>
+        <div class="row2">
+          <div><label for="tribunal">Tribunal</label><select id="tribunal"></select></div>
+          <div><label for="instancia">Instância</label>
+            <select id="instancia"><option value="1">1ª instância</option><option value="2">2ª instância</option></select></div>
+        </div>
+        <div id="comarcaBox" style="display:grid;gap:4px">
+          <label for="comarca">Comarca</label>
+          <select id="comarca"></select>
+          <p class="hint">Aplica os feriados municipais cadastrados no repositório para a comarca.</p>
+        </div>
+        <p class="hint" id="hintSede" hidden>Na 2ª instância aplica-se o calendário da sede do tribunal.</p>
+      </div>
+
+      <div class="step">
+        <label class="check"><input type="checkbox" id="temIndisp"> <span>5. Houve indisponibilidade do sistema</span></label>
+        <div id="indispBox" hidden style="display:grid;gap:10px">
+          <p class="hint">Res. CNJ nº 185/2013, art. 11: prorroga o prazo que vence no dia da indisponibilidade, quando superior a 60 minutos entre 6h e 23h (inciso I) ou ocorrida entre 23h e 24h (inciso II). Não produz efeito entre 0h e 6h, em feriados e em fins de semana (§ 1º).</p>
+          <div id="indispList" style="display:grid;gap:10px"></div>
+          <button type="button" class="btn-ghost btn-small" id="addIndisp" style="justify-self:start">Incluir outra indisponibilidade</button>
+        </div>
+      </div>
+    </form>
+
+    <!-- RESULTADO -->
+    <div class="col">
+      <section class="panel" aria-live="polite">
+        <h2>Resultado</h2>
+        <div id="resultado"><div class="vazio">Informe a data do evento para calcular o prazo.</div></div>
+      </section>
+
+      <section class="panel">
+        <h2>Tópico de tempestividade</h2>
+        <div id="minutaArea">
+          <p class="hint" id="semModelo" hidden style="margin-bottom:12px">Texto-base sem modelo do escritório para esta peça. Revise a redação antes de usar.</p>
+          <div class="docs" id="docFields"></div>
+          <button type="button" class="btn-primary" id="gerar">Gerar minuta</button>
+          <div id="minutaOut" hidden>
+            <div class="minuta-box" id="minuta"></div>
+            <div class="minuta-actions">
+              <button type="button" class="btn-primary" id="copiar">Copiar texto</button>
+              <span class="ok" id="copiado" role="status"></span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- REPOSITÓRIO -->
+  <section class="panel repo" id="repo">
+    <h2>Repositório de atos</h2>
+    <p class="hint" style="margin-bottom:14px">Feriados e suspensões de expediente usados no cálculo e citados na minuta. Cada registro indica o ato e o dispositivo correspondentes.</p>
+    <div class="repo-bar">
+      <div><label for="fTrib">Tribunal</label><select id="fTrib"></select></div>
+      <div><label for="fAno">Ano</label><select id="fAno"></select></div>
+    </div>
+    <div id="repoTabela"></div>
+    <p class="hint" style="margin-top:12px">Para incluir ou alterar atos, edite o arquivo <code>atos.js</code> do projeto. As instruções estão no arquivo LEIAME.md.</p>
+  </section>
+
+  <footer class="nota">Ferramenta de conferência. O resultado não dispensa a verificação do prazo pelo profissional responsável, especialmente quanto a suspensões extraordinárias não cadastradas no repositório.</footer>
+</div>
+
+<script src="atos.js"></script>
+<script>
+(() => {
+"use strict";
+// ---------- Configuração ----------
+const TRIB_NOMES = {
+  STF: "Supremo Tribunal Federal", STJ: "Superior Tribunal de Justiça",
+  TRF1: "Tribunal Regional Federal da 1ª Região", TRF2: "Tribunal Regional Federal da 2ª Região", TRF3: "Tribunal Regional Federal da 3ª Região",
+  TRF4: "Tribunal Regional Federal da 4ª Região", TRF5: "Tribunal Regional Federal da 5ª Região", TRF6: "Tribunal Regional Federal da 6ª Região",
+  TJAC: "Tribunal de Justiça do Acre", TJAL: "Tribunal de Justiça de Alagoas", TJAP: "Tribunal de Justiça do Amapá", TJAM: "Tribunal de Justiça do Amazonas",
+  TJBA: "Tribunal de Justiça da Bahia", TJCE: "Tribunal de Justiça do Ceará", TJDFT: "Tribunal de Justiça do Distrito Federal e dos Territórios",
+  TJES: "Tribunal de Justiça do Espírito Santo", TJGO: "Tribunal de Justiça de Goiás", TJMA: "Tribunal de Justiça do Maranhão",
+  TJMT: "Tribunal de Justiça de Mato Grosso", TJMS: "Tribunal de Justiça de Mato Grosso do Sul", TJMG: "Tribunal de Justiça de Minas Gerais",
+  TJPA: "Tribunal de Justiça do Pará", TJPB: "Tribunal de Justiça da Paraíba", TJPR: "Tribunal de Justiça do Paraná", TJPE: "Tribunal de Justiça de Pernambuco",
+  TJPI: "Tribunal de Justiça do Piauí", TJRJ: "Tribunal de Justiça do Rio de Janeiro", TJRN: "Tribunal de Justiça do Rio Grande do Norte",
+  TJRS: "Tribunal de Justiça do Rio Grande do Sul", TJRO: "Tribunal de Justiça de Rondônia", TJRR: "Tribunal de Justiça de Roraima",
+  TJSC: "Tribunal de Justiça de Santa Catarina", TJSP: "Tribunal de Justiça de São Paulo", TJSE: "Tribunal de Justiça de Sergipe",
+  TJTO: "Tribunal de Justiça do Tocantins"
+};
+const EXT = {1:"um",2:"dois",3:"três",4:"quatro",5:"cinco",6:"seis",7:"sete",8:"oito",9:"nove",10:"dez",15:"quinze",20:"vinte",30:"trinta"};
+const ext = n => EXT[n] ? `${n} (${EXT[n]})` : String(n);
+
+// grupo: agrupa a lista; modelo: texto do escritório (true) ou texto-base (false)
+// Para as peças com texto-base: sujeito/gen (quem foi publicado), fund (fundamento do prazo), fecho (frase final)
+const PECAS = [
+  // Primeira instância
+  { id:"peticao", nome:"Petição", grupo:"Primeira instância", vias:["djen"], dias:5, lei:"art. 218, §3º, do CPC", preparo:false, modelo:true, docPub:true,
+    acao:"manifestação", sujeito:"A intimação", gen:"f", fund:"art. 218, §3º, do Código de Processo Civil", fecho:"Protocolada nesta data, é tempestiva a presente petição." },
+  { id:"replica", nome:"Réplica", grupo:"Primeira instância", vias:["djen"], dias:15, lei:"arts. 350 e 351 do CPC", preparo:false, modelo:true, docPub:true,
+    acao:"apresentação de réplica", sujeito:"A intimação para apresentação de réplica", gen:"f", fund:"arts. 350 e 351 do Código de Processo Civil", fecho:"Protocolada nesta data, é tempestiva a presente Réplica." },
+  { id:"impcs", nome:"Impugnação ao Cumprimento de Sentença", grupo:"Primeira instância", vias:["djen"], dias:15, lei:"arts. 523 e 525 do CPC", preparo:false, modelo:true, docPub:true,
+    acao:"apresentação da impugnação" },
+  { id:"cmand", nome:"Contestação", grupo:"Citação", vias:["mandado"], dias:15, lei:"art. 335, I, e art. 231, do CPC", preparo:false, modelo:true, acao:"apresentação da contestação" },
+  { id:"cdom",  nome:"Contestação", grupo:"Citação", vias:["domicilio"], dias:15, lei:"art. 231, IX, do CPC e art. 20, §3º-B, da Res. CNJ nº 455/2022", preparo:false, modelo:true, acao:"apresentação da contestação" },
+  { id:"caud",  nome:"Contestação", grupo:"Citação", vias:["audiencia"], dias:15, lei:"art. 335, I, do CPC", preparo:false, modelo:true, acao:"apresentação da contestação" },
+  { id:"eexm",  nome:"Embargos à Execução", grupo:"Citação", vias:["mandado"], dias:15, lei:"art. 915 e art. 231, II, do CPC", preparo:false, modelo:true, acao:"oposição dos presentes embargos" },
+  { id:"eexd",  nome:"Embargos à Execução", grupo:"Citação", vias:["domicilio"], dias:15, lei:"art. 915 e art. 231, IX, do CPC", preparo:false, modelo:true, acao:"oposição dos presentes embargos" },
+  // Recursos
+  { id:"apel",   nome:"Apelação", grupo:"Recursos", vias:["djen"], dias:15, lei:"art. 1.003, §5º, do CPC", preparo:true, modelo:true, acao:"interposição do presente recurso" },
+  { id:"capel",  nome:"Contrarrazões à Apelação", grupo:"Recursos", vias:["djen"], dias:15, lei:"art. 1.010, §1º, do CPC", preparo:false, modelo:true, docPub:true,
+    acao:"apresentação das contrarrazões", sujeito:"A intimação para apresentação de contrarrazões", gen:"f", fund:"art. 1.010, §1º, do Código de Processo Civil", fecho:"Protocoladas nesta data, são tempestivas as presentes contrarrazões." },
+  { id:"ai",     nome:"Agravo de Instrumento", grupo:"Recursos", vias:["djen"], dias:15, lei:"art. 1.003, §5º, do CPC", preparo:true, modelo:true, acao:"interposição do presente recurso" },
+  { id:"cai",    nome:"Contrarrazões ao Agravo de Instrumento", grupo:"Recursos", vias:["djen"], dias:15, lei:"art. 1.019, II, do CPC", preparo:false, modelo:true, docPub:true,
+    acao:"apresentação das contrarrazões", sujeito:"A intimação para apresentação de contrarrazões", gen:"f", fund:"art. 1.019, II, do Código de Processo Civil", fecho:"Protocoladas nesta data, são tempestivas as presentes contrarrazões." },
+  { id:"agint",  nome:"Agravo Interno", grupo:"Recursos", vias:["djen"], dias:15, lei:"art. 1.003, §5º, do CPC", preparo:false, modelo:true, acao:"interposição do presente recurso" },
+  { id:"cagint", nome:"Contrarrazões ao Agravo Interno", grupo:"Recursos", vias:["djen"], dias:15, lei:"art. 1.021, §2º, do CPC", preparo:false, modelo:true, docPub:true,
+    acao:"apresentação das contrarrazões", sujeito:"A intimação para apresentação de contrarrazões", gen:"f", fund:"art. 1.021, §2º, do Código de Processo Civil", fecho:"Protocoladas nesta data, são tempestivas as presentes contrarrazões." },
+  { id:"ed",     nome:"Embargos de Declaração", grupo:"Recursos", vias:["djen"], dias:5, lei:"art. 1.023 do CPC", preparo:false, modelo:true, acao:"oposição dos presentes embargos" },
+  { id:"imp",    nome:"Impugnação aos Embargos de Declaração", grupo:"Recursos", vias:["djen"], dias:5, lei:"art. 1.023, §2º, do CPC", preparo:false, modelo:true, acao:"apresentação da impugnação" },
+  // Tribunais superiores
+  { id:"resp",   nome:"Recurso Especial", grupo:"Tribunais superiores", vias:["djen"], dias:15, lei:"art. 1.003, §5º, e art. 1.029 do CPC", preparo:true, modelo:true, docPub:true,
+    acao:"interposição do Recurso Especial", sujeito:"O acórdão recorrido", gen:"m", nomeRec:"Recurso Especial", fund:"art. 1.003, §5º, do Código de Processo Civil", fecho:"Protocolado nesta data, é tempestivo o presente Recurso Especial." },
+  { id:"re",     nome:"Recurso Extraordinário", grupo:"Tribunais superiores", vias:["djen"], dias:15, lei:"art. 1.003, §5º, e art. 1.029 do CPC", preparo:true, modelo:true, docPub:true,
+    acao:"interposição do Recurso Extraordinário", sujeito:"O acórdão recorrido", gen:"m", nomeRec:"Recurso Extraordinário", fund:"art. 1.003, §5º, do Código de Processo Civil", fecho:"Protocolado nesta data, é tempestivo o presente Recurso Extraordinário." },
+  { id:"crre",   nome:"Contrarrazões ao Recurso Especial ou Extraordinário", grupo:"Tribunais superiores", vias:["djen"], dias:15, lei:"art. 1.030 do CPC", preparo:false, modelo:true, docPub:true,
+    acao:"apresentação das contrarrazões", sujeito:"A intimação para apresentação de contrarrazões", gen:"f", fund:"art. 1.030 do Código de Processo Civil", fecho:"Protocoladas nesta data, são tempestivas as presentes contrarrazões." },
+  { id:"aresp",  nome:"Agravo em Recurso Especial ou Extraordinário", grupo:"Tribunais superiores", vias:["djen"], dias:15, lei:"art. 1.042 do CPC", preparo:false, modelo:true, docPub:true,
+    acao:"interposição do Agravo", sujeito:"A decisão agravada", gen:"f", nomeRec:"Agravo", fund:"art. 1.042 do Código de Processo Civil", fecho:"Protocolado nesta data, é tempestivo o presente Agravo." },
+  { id:"caresp", nome:"Contrarrazões ao Agravo em Recurso Especial", grupo:"Tribunais superiores", vias:["djen"], dias:15, lei:"art. 1.042, §3º, do CPC", preparo:false, modelo:true, docPub:true, acao:"apresentação das contrarrazões" },
+  // Juizados
+  { id:"ri",     nome:"Recurso Inominado", grupo:"Juizados Especiais", vias:["djen"], dias:10, lei:"art. 42 da Lei nº 9.099/95", preparo:true, modelo:true, docPub:true, acao:"interposição do presente recurso" },
+  { id:"cri",    nome:"Contrarrazões ao Recurso Inominado", grupo:"Juizados Especiais", vias:["djen"], dias:10, lei:"art. 42, §2º, da Lei nº 9.099/95", preparo:false, modelo:true, docPub:true, acao:"apresentação das contrarrazões" },
+  { id:"edjec",  nome:"Embargos de Declaração no Juizado", grupo:"Juizados Especiais", vias:["djen"], dias:5, lei:"art. 49 da Lei nº 9.099/95", preparo:false, modelo:true, docPub:true,
+    acao:"oposição dos embargos de declaração", sujeito:"A decisão embargada", gen:"f", fund:"art. 49 da Lei nº 9.099/95", fecho:"Protocolados nesta data, são tempestivos os presentes embargos." },
+];
+
+// ---------- Estado ----------
+let atos = [];            // registros do repositório
+let repoOk = false;       // repositório carregado
+let minutaVisivel = false;
+let ultimo = null;        // último resultado
+
+// ---------- Datas ----------
+const DIAS = ["domingo","segunda-feira","terça-feira","quarta-feira","quinta-feira","sexta-feira","sábado"];
+const parse = s => { const [y,m,d] = s.split("-").map(Number); return new Date(Date.UTC(y, m-1, d)); };
+const iso = dt => dt.toISOString().slice(0,10);
+const addDays = (s, n) => iso(new Date(parse(s).getTime() + n*864e5));
+const dow = s => parse(s).getUTCDay();
+const plain = s => s.slice(8,10) + "/" + s.slice(5,7) + "/" + s.slice(0,4);
+const fmt = s => `${plain(s)} (${DIAS[dow(s)]})`;
+const isFds = s => { const w = dow(s); return w === 0 || w === 6; };
+const norm = t => (t || "").normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toLowerCase();
+
+function ctxAtual() {
+  return { tribunal: $("tribunal").value, instancia: $("instancia").value, comarca: $("comarca").value };
+}
+function aplica(r, ctx) {
+  if (r.tribunal !== ctx.tribunal) return false;
+  if (r.abrangencia !== "local") return true;
+  if (ctx.instancia === "2") return !!r.sede;
+  return (r.comarcas || []).some(c => norm(c) === norm(ctx.comarca));
+}
+function motivos(s, ctx) {
+  const out = [];
+  const md = s.slice(5);
+  if (md >= "12-20" || md <= "01-20") out.push({ recesso:true, motivo:"Recesso forense", ato:"CPC", dispositivo:"art. 220" });
+  for (const r of atos) if (r.data === s && r.tipo !== "parcial" && aplica(r, ctx)) out.push(r);
+  return out;
+}
+// expediente parcial ou ponto facultativo com expediente: conta como dia útil, com alerta
+function parciaisDe(s, ctx) { return atos.filter(r => r.data === s && r.tipo === "parcial" && aplica(r, ctx)); }
+const isUtil = (s, ctx) => !isFds(s) && motivos(s, ctx).length === 0;
+function nextUtil(s, ctx) { let d = s; for (let i = 0; i < 400; i++) { d = addDays(d, 1); if (isUtil(d, ctx)) return d; } throw new Error("Sem dia útil em 400 dias"); }
+function addUtil(s, k, ctx) { let d = s; for (let i = 0; i < k; i++) d = nextUtil(d, ctx); return d; }
+
+// ---------- Trecho de suspensões para a minuta ----------
+// artigo do nome do ato: "da Portaria", "do Ato"
+function artAto(ato) { return /^(lei|portaria|resolu|instru|emenda)/i.test(String(ato).trim()) ? "a" : "o"; }
+// vírgula antes de "do/da" quando o dispositivo termina em inciso, alínea ou parágrafo: "art. 36, I, da Lei"
+function virgDisp(disp) { return /^arts?\./i.test(String(disp).trim()) && !/anexo\s+[IVXLC]+$/i.test(String(disp).trim()) && /((^|[\s,])[IVXLC]+|parágrafo único|§\s*\d+º?|,\s*["“]?[a-z]["”]?\)?)$/.test(String(disp).trim()) ? "," : ""; }
+function refAto(disp, ato) { return disp ? `${disp}${virgDisp(disp)} d${artAto(ato)} ${ato}` : ato; }
+// "dos arts. 1º e 2º" quando o dispositivo cita mais de um artigo
+function nosTermos(disp, ato) { return disp ? `nos termos ${/^arts\./i.test(String(disp).trim()) ? "dos" : "do"} ${refAto(disp, ato)}` : `nos termos d${artAto(ato)} ${ato}`; }
+function joinE(arr) { return arr.length <= 1 ? (arr[0] || "") : arr.slice(0, -1).join(", ") + " e " + arr[arr.length - 1]; }
+function juntaDisp(disps) {
+  // agrupa por artigo: "art. 1º, XVI", "art. 4º", "art. 1º, XVII" -> "art. 1º, XVI e XVII e art. 4º"
+  const ordem = [], mapa = {};
+  for (const d of [...new Set(disps)]) {
+    const i = d.indexOf(", ");
+    const art = i < 0 ? d : d.slice(0, i), resto = i < 0 ? "" : d.slice(i + 2);
+    if (!(art in mapa)) { mapa[art] = []; ordem.push(art); }
+    if (resto && !mapa[art].includes(resto)) mapa[art].push(resto);
+  }
+  // vários artigos sem subdivisão: "art. 1º" e "art. 4º" -> "arts. 1º e 4º"
+  if (ordem.length > 1 && ordem.every(a => /^art\.\s/.test(a) && !mapa[a].length)) return "arts. " + joinE(ordem.map(a => a.replace(/^art\.\s*/, "")));
+  return joinE(ordem.map(art => {
+    const r = mapa[art].sort((x, y) => /parágrafo único/.test(x) - /parágrafo único/.test(y));
+    return r.length ? art + ", " + joinE(r) : art;
+  }));
+}
+// dias úteis (seg-sex) suspensos no intervalo (de, ate], agrupados por ato e sequência
+function suspensoes(de, ate, ctx, comDia) {
+  const dias = [];
+  for (let d = addDays(de, 1); d <= ate; d = addDays(d, 1)) {
+    if (isFds(d)) continue;
+    const m = motivos(d, ctx);
+    if (!m.length) continue;
+    const r = m.find(x => x.recesso) || m[0];
+    dias.push({ d, r });
+  }
+  const grupos = [];
+  for (const it of dias) {
+    const g = grupos[grupos.length - 1];
+    if (g && g.ato === it.r.ato && g.lei === (it.r.lei || "") && proximoDiaSemana(g.fim) === it.d) { g.fim = it.d; g.disps.push(it.r.dispositivo); g.n++; }
+    else grupos.push({ ini: it.d, fim: it.d, ato: it.r.ato, lei: it.r.lei || "", disps: [it.r.dispositivo], n: 1 });
+  }
+  const f = comDia ? fmt : plain;
+  const itens = grupos.map(g => {
+    const datas = g.n === 1 ? `no dia ${f(g.ini)}` : g.n === 2 ? `nos dias ${f(g.ini)} e ${f(g.fim)}` : `nos dias ${f(g.ini)} a ${f(g.fim)}`;
+    return `${datas}, ${nosTermos(juntaDisp(g.disps.filter(Boolean)), g.ato)}${g.lei ? " e da " + g.lei : ""}`;
+  });
+  if (!itens.length) return "";
+  return itens.length === 1 ? itens[0] : itens.slice(0, -1).join("; ") + "; e " + itens[itens.length - 1];
+}
+function proximoDiaSemana(s) { let d = addDays(s, 1); while (isFds(d)) d = addDays(d, 1); return d; }
+
+// ---------- Cálculo ----------
+function calcular() {
+  const ctx = ctxAtual();
+  const peca = PECAS.find(p => p.id === $("peca").value);
+  const n = Math.max(1, parseInt($("dias").value, 10) || peca.dias);
+  const via = viaAtual();
+  const avisos = [];
+  const r = { peca, n, via, ctx, avisos };
+
+  if (via === "djen") {
+    const disp = $("dDisp").value, pub = $("dPub").value;
+    if (!disp && !pub) return null;
+    r.disp = disp || null;
+    if (pub) {
+      r.pub = pub;
+      if (disp) { const calc = nextUtil(disp, ctx); if (calc !== pub) avisos.push(`A publicação informada (${fmt(pub)}) difere do 1º dia útil seguinte à disponibilização (${fmt(calc)}). O cálculo usa a publicação informada.`); }
+      if (!isUtil(pub, ctx)) avisos.push(`A publicação informada cai em dia não útil (${fmt(pub)}). Confira a data.`);
+    } else r.pub = nextUtil(disp, ctx);
+    r.base = r.pub;
+    if (peca.id === "impcs") {
+      r.pagIni = nextUtil(r.pub, ctx);              // art. 523: 15 dias úteis para pagamento
+      r.pagFim = addUtil(r.pagIni, 14, ctx);
+      r.inicio = nextUtil(r.pagFim, ctx);           // art. 525: início da impugnação
+    } else r.inicio = nextUtil(r.pub, ctx);
+    r.fim = addUtil(r.inicio, n - 1, ctx);
+    r.origem = r.disp || r.pub;
+  } else if (via === "domicilio") {
+    const c = $("dCit").value; if (!c) return null;
+    r.ciencia = c;
+    const cu = isUtil(c, ctx) ? c : nextUtil(c, ctx);
+    if (cu !== c) avisos.push(`A ciência ocorreu em dia não útil e foi considerada em ${fmt(cu)}.`);
+    r.quinto = addUtil(cu, 5, ctx);
+    r.base = c;
+    r.inicio = r.quinto;
+    r.primeiro = nextUtil(r.quinto, ctx);
+    r.fim = addUtil(r.primeiro, n - 1, ctx);
+    r.origem = c;
+  } else {
+    const j = $("dCit").value; if (!j) return null;
+    if (via === "audiencia") r.audiencia = j; else r.juntada = j;
+    r.base = j;
+    r.inicio = nextUtil(j, ctx);
+    r.fim = addUtil(r.inicio, n - 1, ctx);
+    r.origem = j;
+  }
+
+  // Indisponibilidades (Res. CNJ 185/2013, art. 11)
+  r.fimOriginal = r.fim; r.indispAplicadas = []; r.indispSemEfeito = [];
+  const lista = $("temIndisp").checked ? lerIndisp() : [];
+  let mudou = true, guard = 0;
+  while (mudou && guard++ < 20) {
+    mudou = false;
+    for (const it of lista) {
+      if (!it.data || r.indispAplicadas.includes(it)) continue;
+      if (it.data === r.fim && it.enq !== "nao" && isUtil(it.data, ctx)) { r.indispAplicadas.push(it); r.fim = nextUtil(r.fim, ctx); mudou = true; }
+    }
+  }
+  for (const it of lista) if (it.data && !r.indispAplicadas.includes(it)) {
+    let motivo;
+    if (it.enq === "nao") motivo = "não se enquadra nos incisos do art. 11";
+    else if (!isUtil(it.data, ctx)) motivo = "ocorreu em dia não útil (art. 11, § 1º)";
+    else motivo = "não ocorreu no dia do vencimento do prazo";
+    r.indispSemEfeito.push({ it, motivo });
+  }
+
+  // Feriados municipais no período: alerta para conferir a lei local
+  r.municipais = [];
+  for (let d = addDays(r.origem, 1); d <= r.fim; d = addDays(d, 1)) {
+    if (isFds(d)) continue;
+    for (const a of motivos(d, ctx)) if (a.municipal) r.municipais.push({ d, a });
+  }
+  // Expediente parcial ou ponto facultativo no período (contado como dia útil: margem de segurança)
+  r.parciais = [];
+  for (let d = r.origem; d <= r.fim; d = addDays(d, 1)) {
+    if (isFds(d) || !isUtil(d, ctx)) continue;
+    for (const a of parciaisDe(d, ctx)) r.parciais.push({ d, a });
+  }
+  if (ctx.instancia === "1" && ctx.comarca !== "__outra") {
+    r.indefinidos = (window.FERIADOS_INDEFINIDOS || []).filter(x => x.tribunal === ctx.tribunal && norm(x.comarca) === norm(ctx.comarca));
+  } else r.indefinidos = [];
+
+  // Anos sem atos cadastrados
+  if (repoOk) {
+    const anos = new Set(atos.filter(a => a.tribunal === ctx.tribunal).map(a => a.data.slice(0, 4)));
+    const tocados = new Set([r.origem.slice(0, 4), r.fim.slice(0, 4)]);
+    for (const a of tocados) if (!anos.has(a)) avisos.push(`Não há atos do ${ctx.tribunal || "tribunal"} cadastrados para ${a}. Os feriados desse ano não foram considerados.`);
+    const temLocais = atos.some(a => a.tribunal === ctx.tribunal && a.abrangencia === "local" && (a.comarcas || []).length);
+    if (ctx.instancia === "1" && ctx.comarca === "__outra" && temLocais) avisos.push("Comarca não informada: nenhum feriado municipal foi aplicado. Selecione a comarca, se houver feriado municipal cadastrado.");
+    if (ctx.instancia === "1" && !/^(STF|STJ)$/.test(ctx.tribunal) && !atos.some(a => a.tribunal === ctx.tribunal && a.municipal)) avisos.push(`Os feriados municipais das comarcas ou subseções do ${ctx.tribunal} não estão cadastrados${temLocais ? ", exceto os indicados na lista de comarcas" : ""}. Confira os feriados locais do foro do processo.`);
+    for (const al of (window.ALERTAS_TRIBUNAIS || [])) if (al.tribunal === ctx.tribunal && (!al.instancia || al.instancia === ctx.instancia)) avisos.push(al.texto);
+  } else avisos.push("Repositório de atos indisponível: o cálculo considerou apenas fins de semana e o recesso do art. 220 do CPC.");
+  return r;
+}
+
+// ---------- Minuta ----------
+function paragrafoPublicacao(r, sujeito, gen) {
+  const o = gen === "m" ? "o" : "a";
+  if (r.disp) {
+    const sp = suspensoes(r.disp, addDays(r.pub, -1), r.ctx, false);
+    return `${sujeito} foi disponibilizad${o} no Diário de Justiça Eletrônico no dia ${plain(r.disp)} (DOC. ${v("docPub")}), de modo que, nos termos do art. 224, §2º, do Código de Processo Civil, considera-se a data de publicação o primeiro dia útil subsequente ao da disponibilização, em ${fmt(r.pub)}` +
+      (sp ? `, em razão da suspensão dos prazos processuais ${sp} (DOC. ${v("docAto")}).` : ".");
+  }
+  return `${sujeito} foi publicad${o} no Diário de Justiça Eletrônico em ${fmt(r.pub)} (DOC. ${v("docPub")}).`;
+}
+const v = id => ($(id) && $(id).value.trim()) || "__";
+function minuta(r) {
+  const { peca, n, ctx } = r;
+  const P = [];      // parágrafos
+  let iTermo = -1;   // parágrafo após o qual entra a indisponibilidade
+  const S = (de) => suspensoes(de, r.fimOriginal, ctx, false);
+  const docAto = `(DOC. ${v("docAto")})`;
+  const comS = (s, pre) => s ? `${pre} ${s} ${docAto}.` : ".";
+
+  switch (peca.id) {
+    case "ai": {
+      const s = S(r.pub);
+      P.push(`O Código de Processo Civil, especificamente em seu art. 1.003, §5º, preceitua que o prazo para interpor recursos será de ${ext(n)} dias, a contar da intimação da decisão recorrida. Ademais, o art. 219 do mesmo texto legal dispõe que a contagem desses prazos será feita computando-se somente os dias úteis.`);
+      P.push(`Dessa forma, a decisão agravada foi publicada no DJEN em ${fmt(r.pub)}, de modo que o prazo para interposição do presente recurso teve início em ${fmt(r.inicio)}, primeiro dia útil subsequente.`);
+      P.push(`Realizando-se a contagem estritamente em dias úteis, o termo final para o protocolo do recurso expira em ${fmt(r.fimOriginal)}` + comS(s, ", em razão da suspensão dos prazos processuais"));
+      iTermo = P.length - 1;
+      P.push(`Ademais, o preparo recursal demonstra-se efetivamente pago, conforme comprovante anexo (DOC. ${v("docPrep")}).`);
+      P.push(`Protocolado nesta data, mostra-se tempestiva o presente Agravo de Instrumento.`);
+      break;
+    }
+    case "agint": {
+      const s = S(r.pub);
+      P.push(`O Código de Processo Civil vigente, especificamente em seu art. 1.003, §5º, preceitua que o prazo para interpor recursos será de ${ext(n)} dias a contar da intimação da decisão. Ademais, o art. 219 do mesmo texto legal dispõe que a contagem desses prazos será feita computando-se somente os dias úteis.`);
+      P.push(`A decisão agravada foi publicada no DJEN em ${fmt(r.pub)}, de modo que a contagem do prazo para o presente recurso teve início na data de ${fmt(r.inicio)}, primeiro dia útil subsequente, e se encerra em ${fmt(r.fimOriginal)}` + comS(s, ", considerando a suspensão dos prazos processuais"));
+      iTermo = P.length - 1;
+      P.push(`Protocolado nesta data, resta comprovada a tempestividade deste recurso.`);
+      break;
+    }
+    case "apel": {
+      const s = S(r.pub);
+      P.push(`Nos termos do art. 1.003, §5º, do Código de Processo Civil, o prazo para interposição da Apelação é de ${ext(n)} dias, contados da publicação da sentença, devendo sua contagem ocorrer em dias úteis, conforme dispõe o art. 219 do mesmo diploma legal.`);
+      P.push(`No caso em apreço, a sentença foi publicada no Diário de Justiça Eletrônico Nacional (DJEN) em ${fmt(r.pub)}, iniciando-se a contagem do prazo recursal no primeiro dia útil subsequente, qual seja, ${fmt(r.inicio)} e o prazo final para interposição do presente recurso se dá em ${fmt(r.fimOriginal)}` + comS(s, ", em razão da suspensão dos prazos processuais"));
+      iTermo = P.length - 1;
+      P.push(`Protocolada dentro do prazo legal, resta demonstrada a tempestividade da presente Apelação.`);
+      P.push(`Registre-se, por fim, o regular recolhimento do preparo recursal, conforme demonstram a guia e o respectivo comprovante de pagamento das custas anexados (DOC. ${v("docPrep")}), ambos realizados tempestivamente. Inexiste, portanto, qualquer óbice ao conhecimento e ao regular processamento do presente recurso.`);
+      break;
+    }
+    case "ri": {
+      const s = S(r.pub);
+      P.push(r.disp
+        ? `A sentença recorrida foi disponibilizada no DJEN em ${fmt(r.disp)} (DOC. ${v("docPub")}), sendo publicada no primeiro dia útil subsequente em ${fmt(r.pub)}.`
+        : `A sentença recorrida foi publicada no DJEN em ${fmt(r.pub)} (DOC. ${v("docPub")}).`);
+      P.push(`Nos termos do art. 42, da Lei nº 9.099/95, o prazo legal para interposição de Recurso Inominado é de ${ext(n)} dia úteis. ` +
+        (s ? `Tendo em vista a suspensão processual ${s} ${docAto}, o prazo` : `O prazo`) +
+        ` legal para interposição do recurso iniciou-se em ${fmt(r.inicio)}, primeiro dia útil subsequente à data da publicação, e se encerra em ${fmt(r.fimOriginal)}.`);
+      iTermo = P.length - 1;
+      P.push(`Apresentada nesta data, mostra-se tempestivo o presente Recurso Inominado.`);
+      P.push(`Ademais, tem-se comprovado o efetivo preparo recursal, por meio das guias de custas anexadas à presente petição (DOC. ${v("docPrep")}).`);
+      break;
+    }
+    case "cri": {
+      const s = S(r.pub);
+      P.push(`Consoante dispõe o art. 42, §2 da Lei 9.099/95, o prazo para a apresentação de contrarrazões ao Recurso Inominado será de ${ext(n)} dias úteis.`);
+      P.push(`No presente caso, a intimação ocorreu em ${fmt(r.pub)}, por meio de publicação no DJEN (DOC. ${v("docPub")}) iniciando-se a contagem do prazo legal de ${n} dias úteis para apresentação das contrarrazões no dia útil subsequente, qual seja, ${fmt(r.inicio)}, de modo que o prazo final se encerrará em ${fmt(r.fimOriginal)}` + comS(s, ", em razão da suspensão dos prazos processuais"));
+      iTermo = P.length - 1;
+      P.push(`Dessa forma, resta inequívoca a tempestividade da resposta apresentada nesta data.`);
+      break;
+    }
+    case "ed": {
+      const s = S(r.pub);
+      P.push((r.disp
+        ? `A decisão monocrática embargada foi disponibilizada em ${plain(r.disp)} e publicada em ${fmt(r.pub)}`
+        : `A decisão monocrática embargada foi publicada em ${fmt(r.pub)}`) +
+        `, de modo que o prazo de ${ext(n)} dias úteis previsto no art. 1.023 do Código de Processo Civil, teve início no primeiro dia útil subsequente, em ${fmt(r.inicio)} e se encerra em ${fmt(r.fimOriginal)}` + comS(s, ", em razão da suspensão dos prazos processuais"));
+      iTermo = P.length - 1;
+      P.push(`Protocolados nesta data, são tempestivos os presentes embargos.`);
+      break;
+    }
+    case "imp": {
+      const s = S(r.pub);
+      P.push(`O Código de Processo Civil estabelece em seu art. 1.023, §2º que o prazo para manifestação sobre os embargos de declaração, quando seu eventual acolhimento implica em modificação da decisão, é de ${ext(n)} dias contados da data de intimação. Considerando que foi publicada a intimação à Embargada em ${fmt(r.pub)}, o prazo em questão teve início em ${fmt(r.inicio)} e findará somente em ${fmt(r.fimOriginal)}` + comS(s, ", em razão da suspensão dos prazos processuais"));
+      iTermo = P.length - 1;
+      P.push(`Sendo assim, resta demonstrada a tempestividade da impugnação apresentada nesta data.`);
+      break;
+    }
+    case "caresp": {
+      P.push(`O prazo para apresentação de contrarrazões ao Agravo em Recurso Especial, nos termos do art. 1.042, §3º, combinado com o art. 219, ambos do Código de Processo Civil, é de ${ext(n)} dias úteis.`);
+      if (r.disp) {
+        const sp = suspensoes(r.disp, addDays(r.pub, -1), ctx, false);
+        P.push(`A Recorrida tomou ciência da sentença embargada por meio de disponibilização no Diário de Justiça Eletrônico Nacional (DJEN) em ${fmt(r.disp)} (DOC. ${v("docPub")}), de modo que foi publicada em ${fmt(r.pub)}, primeiro dia útil subsequente` + comS(sp, ", em razão da suspensão dos prazos"));
+      } else {
+        P.push(`A Recorrida tomou ciência da sentença embargada por meio de publicação no Diário de Justiça Eletrônico Nacional (DJEN) em ${fmt(r.pub)} (DOC. ${v("docPub")}).`);
+      }
+      const s = S(r.pub);
+      P.push(`Desse modo, a contagem do prazo para o presente recurso teve início na data de ${fmt(r.inicio)}, primeiro dia útil após a publicação, e irá se encerrar em ${fmt(r.fimOriginal)}` + (s ? `, considerando a suspensão dos prazos processuais ${s} (vide DOC. ${v("docAto")}).` : "."));
+      iTermo = P.length - 1;
+      P.push(`Protocolados nesta data, mostram-se tempestivos as presentes contrarrazões.`);
+      break;
+    }
+    case "cmand": {
+      const s = S(r.juntada);
+      P.push(`O prazo para apresentação de Contestação, nos termos art. 335, inciso I, combinado com o art. 231, inciso V, e art. 219, todos do Código de Processo Civil, é de ${ext(n)} dias úteis.`);
+      P.push(`Dessa forma, a juntada do mandado ocorreu em ${fmt(r.juntada)}, de modo que o prazo para apresentação da presente contestação teve início em ${fmt(r.inicio)}, primeiro dia útil subsequente.`);
+      P.push(`Realizando-se a contagem estritamente em dias úteis, o termo final para o protocolo da presente peça defensiva expira em ${fmt(r.fimOriginal)}` + comS(s, ", em razão da suspensão dos prazos processuais"));
+      iTermo = P.length - 1;
+      P.push(`Portanto, plenamente tempestiva a presente manifestação.`);
+      break;
+    }
+    case "cdom": {
+      const s = S(r.ciencia);
+      P.push(`Conforme prevê o art. 231, do Código de Processo Civil, o prazo de ${ext(n)} dias para apresentação de contestação iniciará a partir da citação.`);
+      P.push(`Nos casos de citação por meio do Domicílio Judicial Eletrônico (DJE), uma vez confirmada a citação eletrônica, o prazo para resposta começa a correr no quinto dia útil seguinte à confirmação, na forma do art. 231, IX, do CPC e do art. 20, §3º-B da Resolução nº 455/2022 do CNJ.`);
+      P.push(`A citação da parte Ré para apresentação de contestação ocorreu por meio do Domicílio Judicial Eletrônico (ID. nº ${v("idCit")}) em ${fmt(r.ciencia)}, de modo que o prazo para apresentação da contestação se iniciou em ${fmt(r.quinto)} e findará apenas em ${fmt(r.fimOriginal)}` + comS(s, ", em razão da suspensão dos prazos processuais"));
+      iTermo = P.length - 1;
+      P.push(`Desta forma, mostra-se tempestiva a contestação apresentada nesta data.`);
+      break;
+    }
+
+    case "caud": {
+      const s = S(r.audiencia);
+      P.push(`O prazo para apresentação de Contestação, nos termos do art. 335, inciso I, combinado com o art. 219, ambos do Código de Processo Civil, é de ${ext(n)} dias úteis, contados da audiência de conciliação ou de mediação.`);
+      P.push(`Dessa forma, a audiência de conciliação ocorreu em ${fmt(r.audiencia)}, de modo que o prazo para apresentação da presente contestação teve início em ${fmt(r.inicio)}, primeiro dia útil subsequente.`);
+      P.push(`Realizando-se a contagem estritamente em dias úteis, o termo final para o protocolo da presente peça defensiva expira em ${fmt(r.fimOriginal)}` + comS(s, ", em razão da suspensão dos prazos processuais"));
+      iTermo = P.length - 1;
+      P.push(`Portanto, plenamente tempestiva a presente manifestação.`);
+      break;
+    }
+    case "eexm": {
+      const s = S(r.juntada);
+      P.push(`O prazo para oposição de Embargos à Execução, nos termos do art. 915, combinado com o art. 231, inciso II, e art. 219, todos do Código de Processo Civil, é de ${ext(n)} dias úteis, contados da juntada aos autos do mandado de citação.`);
+      P.push(`Dessa forma, a juntada do mandado de citação ocorreu em ${fmt(r.juntada)}, de modo que o prazo para oposição dos presentes embargos teve início em ${fmt(r.inicio)}, primeiro dia útil subsequente.`);
+      P.push(`Realizando-se a contagem estritamente em dias úteis, o termo final para oposição dos presentes embargos expira em ${fmt(r.fimOriginal)}` + comS(s, ", em razão da suspensão dos prazos processuais"));
+      iTermo = P.length - 1;
+      P.push(`Protocolados nesta data, são tempestivos os presentes embargos.`);
+      break;
+    }
+    case "eexd": {
+      const s = S(r.ciencia);
+      P.push(`Conforme prevê o art. 915 do Código de Processo Civil, o prazo de ${ext(n)} dias para oposição de embargos à execução será contado conforme o art. 231 do mesmo diploma legal.`);
+      P.push(`Nos casos de citação por meio do Domicílio Judicial Eletrônico (DJE), uma vez confirmada a citação eletrônica, o prazo começa a correr no quinto dia útil seguinte à confirmação, na forma do art. 231, IX, do CPC e do art. 20, §3º-B da Resolução nº 455/2022 do CNJ.`);
+      P.push(`A citação da parte Executada ocorreu por meio do Domicílio Judicial Eletrônico (ID. nº ${v("idCit")}) em ${fmt(r.ciencia)}, de modo que o prazo para oposição dos embargos se iniciou em ${fmt(r.quinto)} e findará apenas em ${fmt(r.fimOriginal)}` + comS(s, ", em razão da suspensão dos prazos processuais"));
+      iTermo = P.length - 1;
+      P.push(`Desta forma, mostram-se tempestivos os embargos opostos nesta data.`);
+      break;
+    }
+    case "impcs": {
+      const s1 = suspensoes(r.pub, r.pagFim, ctx, false);
+      const s2 = suspensoes(r.pagFim, r.fimOriginal, ctx, false);
+      P.push(`Nos termos do art. 523 do Código de Processo Civil, o executado será intimado para pagar o débito no prazo de 15 (quinze) dias e, conforme o art. 525 do mesmo diploma legal, transcorrido esse prazo sem o pagamento voluntário, inicia-se o prazo de ${ext(n)} dias para apresentação de impugnação, independentemente de penhora ou nova intimação. A contagem desses prazos é feita em dias úteis, nos termos do art. 219 do Código de Processo Civil.`);
+      P.push(paragrafoPublicacao(r, "A intimação para pagamento", "f"));
+      P.push(`Assim, o prazo para pagamento voluntário teve início em ${fmt(r.pagIni)} e encerrou-se em ${fmt(r.pagFim)}` +
+        (s1 ? `, considerando a suspensão dos prazos processuais ${s1} ${docAto}` : "") +
+        `, iniciando-se em ${fmt(r.inicio)} o prazo de ${ext(n)} dias úteis para apresentação da presente impugnação, que findará em ${fmt(r.fimOriginal)}` +
+        (s2 ? `, tendo em vista a suspensão dos prazos processuais ${s2} ${docAto}.` : "."));
+      iTermo = P.length - 1;
+      P.push(`Protocolada nesta data, é tempestiva a presente impugnação.`);
+      break;
+    }
+    default: {
+      // Padrão do modelo de Agravo em Recurso Especial ou Extraordinário enviado pelo escritório
+      const s = S(r.pub);
+      P.push(paragrafoPublicacao(r, peca.sujeito, peca.gen));
+      P.push(`Assim, o prazo de ${ext(n)} dias úteis para ${peca.acao}, ${peca.id === "peticao" && n !== 5 ? "previsto no despacho que o fixou" : (peca.fund.startsWith("arts.") ? "previsto nos " : "previsto no ") + peca.fund}, teve início no primeiro dia útil subsequente, em ${fmt(r.inicio)}, e findará em ${fmt(r.fimOriginal)}` +
+        (s ? `, tendo em vista a suspensão dos prazos processuais ${s} ${docAto}.` : "."));
+      iTermo = P.length - 1;
+      P.push(peca.fecho);
+      if (peca.preparo) P.push(`Registre-se, por fim, o regular recolhimento do preparo recursal, conforme demonstram a guia e o respectivo comprovante de pagamento das custas anexados (DOC. ${v("docPrep")}), ambos realizados tempestivamente. Inexiste, portanto, qualquer óbice ao conhecimento e ao regular processamento do presente recurso.`);
+    }
+  }
+
+  // Indisponibilidade (texto-base indicado pelo escritório)
+  if (r.indispAplicadas.length) {
+    const nomeTrib = TRIB_NOMES[ctx.tribunal] || ctx.tribunal;
+    const extra = [];
+    r.indispAplicadas.forEach((it, i) => {
+      extra.push(`${i === 0 ? "Ocorre que" : "Do mesmo modo"}, no dia ${fmt(it.data)} o PJe ficou indisponível por ${it.duracao || "__"}, consoante informado no sítio eletrônico do ${nomeTrib} e no relatório de indisponibilidades (DOC. ${it.doc || "__"}).` +
+        (i === 0 ? ` E, nos termos do art. 10, §2º, da Lei 11.419/2006, que dispõe sobre a informatização do processo judicial, nos casos de indisponibilidade do sistema por motivos técnicos, o prazo para apresentação de manifestação será prorrogado automaticamente para o primeiro dia útil seguinte à resolução do problema.` : ""));
+    });
+    const ultimaIndisp = r.indispAplicadas[r.indispAplicadas.length - 1].data;
+    const sf = suspensoes(ultimaIndisp, r.fim, ctx, true);
+    extra.push(`Nesse sentido, ${sf ? `considerando o feriado ${sf.replace(/^no dia/, "do dia").replace(/^nos dias/, "dos dias")}, ` : ""}o prazo para ${peca.acao} fica automaticamente prorrogado para o dia ${fmt(r.fim)}.`);
+    P.splice(iTermo + 1, 0, ...extra);
+  }
+  return P.join("\n\n");
+}
+
+// ---------- Interface ----------
+function $(id) { return document.getElementById(id); }
+function viaAtual() {
+  if (document.querySelector('input[name=via]:checked').value === "djen") return "djen";
+  return document.querySelector('input[name=cit]:checked').value;
+}
+function atualizaPecas() {
+  const via = viaAtual();
+  const sel = $("peca"); const atual = sel.value;
+  const lista = PECAS.filter(p => p.vias.includes(via));
+  sel.innerHTML = "";
+  const grupos = [...new Set(lista.map(p => p.grupo))];
+  const agrupar = grupos.length > 1;
+  for (const g of grupos) {
+    const destino = agrupar ? document.createElement("optgroup") : sel;
+    if (agrupar) { destino.label = g; sel.appendChild(destino); }
+    for (const p of lista.filter(x => x.grupo === g)) { const o = document.createElement("option"); o.value = p.id; o.textContent = p.nome; destino.appendChild(o); }
+  }
+  if (lista.some(p => p.id === atual)) sel.value = atual;
+  sel.disabled = lista.length === 1;
+  aplicaPeca();
+  const djen = via === "djen";
+  $("citGroup").hidden = djen;
+  $("datasDjen").hidden = !djen; $("hintDjen").hidden = !djen;
+  $("datasCit").hidden = djen;
+  $("lblCit").textContent = via === "mandado" ? "Data da juntada do mandado aos autos" : via === "audiencia" ? "Data da audiência de conciliação ou de mediação" : "Data da ciência no Domicílio Judicial Eletrônico";
+}
+function aplicaPeca() {
+  const p = PECAS.find(x => x.id === $("peca").value);
+  $("dias").value = p.dias;
+  $("lei").textContent = p.lei;
+  renderDocFields();
+}
+function renderDocFields() {
+  const p = PECAS.find(x => x.id === $("peca").value);
+  const campos = [];
+  if (p.docPub) campos.push(["docPub", "DOC. da publicação"]);
+  campos.push(["docAto", "DOC. dos atos de suspensão"]);
+  if (p.preparo) campos.push(["docPrep", "DOC. do preparo"]);
+  if (p.vias.includes("domicilio")) campos.push(["idCit", "ID da citação"]);
+  $("semModelo").hidden = p.modelo !== false;
+  const box = $("docFields"); const antigos = {};
+  box.querySelectorAll("input").forEach(i => antigos[i.id] = i.value);
+  box.innerHTML = "";
+  for (const [id, rot] of campos) {
+    const d = document.createElement("div");
+    d.innerHTML = `<label for="${id}"></label><input type="text" id="${id}" placeholder="Opcional">`;
+    d.querySelector("label").textContent = rot;
+    d.querySelector("input").value = antigos[id] || "";
+    box.appendChild(d);
+  }
+}
+
+let indispSeq = 0;
+function addIndisp() {
+  const id = ++indispSeq;
+  const el = document.createElement("div");
+  el.className = "indisp-item"; el.dataset.id = id;
+  el.innerHTML = `
+    <div class="indisp-head"><span class="lbl">Indisponibilidade</span><button type="button" class="btn-ghost btn-small rm">Remover</button></div>
+    <div class="row2">
+      <div><label for="iData${id}">Data</label><input type="date" id="iData${id}" class="iData"></div>
+      <div><label for="iDur${id}">Duração</label><input type="text" id="iDur${id}" class="iDur" placeholder="2 horas"></div>
+    </div>
+    <div style="display:grid;gap:4px"><label for="iEnq${id}">Enquadramento (art. 11 da Res. CNJ nº 185/2013)</label>
+      <select id="iEnq${id}" class="iEnq">
+        <option value="I">Superior a 60 minutos entre 6h e 23h (inciso I)</option>
+        <option value="II">Ocorrida entre 23h e 24h (inciso II)</option>
+        <option value="nao">Outra situação (sem efeito de prorrogação)</option>
+      </select></div>
+    <div style="display:grid;gap:4px"><label for="iDoc${id}">DOC. do relatório de indisponibilidades</label><input type="text" id="iDoc${id}" class="iDoc" placeholder="Opcional"></div>`;
+  el.querySelector(".rm").addEventListener("click", () => { el.remove(); if (!$("indispList").children.length) $("temIndisp").checked = false, $("indispBox").hidden = true; atualizar(); });
+  $("indispList").appendChild(el);
+}
+function lerIndisp() {
+  return [...$("indispList").children].map(el => ({
+    key: el.dataset.id,
+    data: el.querySelector(".iData").value,
+    duracao: el.querySelector(".iDur").value.trim(),
+    enq: el.querySelector(".iEnq").value,
+    doc: el.querySelector(".iDoc").value.trim(),
+  }));
+}
+
+function tl(r) {
+  const ctx = r.ctx; const linhas = [];
+  let k = 0, kp = 0;
+  const contaDe = r.via === "domicilio" ? r.primeiro : r.inicio;
+  for (let d = r.origem; d <= r.fim; d = addDays(d, 1)) {
+    const m = motivos(d, ctx); const fds = isFds(d);
+    let cls = "", info = "";
+    const marcos = [];
+    if (d === r.disp) marcos.push("Disponibilização no DJEN");
+    if (d === r.pub) marcos.push("Publicação no DJEN");
+    if (d === r.ciencia) marcos.push("Ciência no Domicílio Judicial Eletrônico");
+    if (d === r.juntada) marcos.push("Juntada do mandado");
+    if (d === r.audiencia) marcos.push("Audiência de conciliação ou de mediação");
+    if (d === r.pagIni) marcos.push("Início do prazo para pagamento (art. 523)");
+    if (d === r.pagFim) marcos.push("Fim do prazo para pagamento (art. 523)");
+    if (r.pagIni && d === r.inicio) marcos.push("Início do prazo para impugnação (art. 525)");
+    if (r.via === "domicilio" && d === r.quinto) marcos.push("5º dia útil após a ciência");
+    let num = "";
+    if (d >= contaDe && !fds && !m.length) { k++; num = String(k); }
+    else if (r.pagIni && d >= r.pagIni && d <= r.pagFim && !fds && !m.length) { kp++; num = "P" + kp; }
+    if (fds) { cls = "fds"; info = DIAS[dow(d)][0].toUpperCase() + DIAS[dow(d)].slice(1); }
+    if (m.length) { cls = fds ? "fds" : "susp"; info = m.map(x => `${x.motivo} (${refAto(x.dispositivo, x.ato)})`).join("; "); }
+    else if (!fds) { const pc = parciaisDe(d, ctx); if (pc.length) { cls = "parc"; info = "Contado como dia útil, com alerta: " + pc.map(x => `${x.motivo} (${refAto(x.dispositivo, x.ato)})`).join("; "); } }
+    const ind = r.indispAplicadas.find(x => x.data === d);
+    if (ind) { info = (info ? info + "; " : "") + "Indisponibilidade do sistema: prazo prorrogado"; num = num ? num + "*" : num; }
+    if (marcos.length) { cls = (cls ? cls + " " : "") + "marco"; info = marcos.join("; ") + (info ? "; " + info : ""); }
+    if (d === r.fim) { cls = "fim"; info = "Termo final" + (info ? "; " + info : ""); }
+    linhas.push(`<tr class="${cls}"><td class="dt">${plain(d)}</td><td>${DIAS[dow(d)]}</td><td class="num">${num}</td><td>${esc(info)}</td></tr>`);
+  }
+  return `<details class="tl"><summary>Contagem dia a dia</summary><div class="tl-wrap"><table><thead><tr><th>Data</th><th>Dia</th><th>Dia do prazo</th><th>Observação</th></tr></thead><tbody>${linhas.join("")}</tbody></table></div></details>`;
+}
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c])); }
+
+function cel(k, s, cls) { return `<div class="${cls || ""}"><div class="k">${k}</div><div class="v">${plain(s)}</div><div class="d">${DIAS[dow(s)]}</div></div>`; }
+function atualizar() {
+  let r = null;
+  try { r = calcular(); } catch (e) { $("resultado").innerHTML = `<div class="msg alerta">${esc(e.message)}</div>`; return; }
+  ultimo = r;
+  if (!r) {
+    $("resultado").innerHTML = `<div class="vazio">Informe a data do evento para calcular o prazo.</div>`;
+    $("gerar").disabled = true; $("minutaOut").hidden = true; return;
+  }
+  $("gerar").disabled = false;
+  const c = [];
+  if (r.via === "djen" && r.pagIni) { c.push(cel("Publicação", r.pub)); c.push(cel("Pagamento: início", r.pagIni)); c.push(cel("Pagamento: fim", r.pagFim)); c.push(cel("Impugnação: início", r.inicio)); }
+  else if (r.via === "djen") { if (r.disp) c.push(cel("Disponibilização", r.disp)); c.push(cel("Publicação", r.pub)); c.push(cel("Início", r.inicio)); }
+  else if (r.via === "domicilio") { c.push(cel("Ciência", r.ciencia)); c.push(cel("5º dia útil", r.quinto)); c.push(cel("1º dia da contagem", r.primeiro)); }
+  else if (r.via === "audiencia") { c.push(cel("Audiência", r.audiencia)); c.push(cel("Início", r.inicio)); }
+  else { c.push(cel("Juntada", r.juntada)); c.push(cel("Início", r.inicio)); }
+  if (r.indispAplicadas.length) c.push(cel("Termo sem prorrogação", r.fimOriginal));
+  c.push(cel("Termo final", r.fim, "final"));
+  const msgs = [];
+  const sp = suspensoes(r.origem, r.fim, r.ctx, true);
+  if (sp) msgs.push(`<div class="msg">Dias excluídos: ${esc(sp)}.</div>`);
+  for (const it of r.indispAplicadas) msgs.push(`<div class="msg alerta">Indisponibilidade em ${esc(fmt(it.data))}: termo final prorrogado (art. 11, inciso ${it.enq}, da Res. CNJ nº 185/2013).</div>`);
+  for (const x of r.indispSemEfeito) msgs.push(`<div class="msg">Indisponibilidade em ${esc(fmt(x.it.data))} sem efeito no prazo: ${esc(x.motivo)}.</div>`);
+  for (const x of r.municipais) msgs.push(`<div class="msg alerta"><strong>Feriado municipal em ${esc((x.a.comarcas || []).join(", ") || "sede")} no dia ${esc(fmt(x.d))}</strong>: ${esc(x.a.motivo)}. Confira o feriado na lei municipal antes de usar o prazo. Lei municipal: ${x.a.lei ? esc(x.a.lei) : "não informada na lista do TJPE"}.</div>`);
+  for (const x of r.indefinidos) msgs.push(`<div class="msg alerta"><strong>Feriado sem data definida na lista do TJPE</strong> para ${esc(x.comarca)}: ${esc(x.texto)}. Esse feriado não foi considerado no cálculo. Confira a data na lei municipal.</div>`);
+  for (const x of r.parciais) msgs.push(`<div class="msg alerta"><strong>Expediente parcial ou ponto facultativo em ${esc(fmt(x.d))}</strong>: ${esc(x.a.motivo)} (${esc(refAto(x.a.dispositivo, x.a.ato))}). O cálculo contou esse dia como útil, por margem de segurança. Se ele não for considerado dia útil, ${x.d === r.fim ? "o termo final passa para o dia útil seguinte" : "as datas seguintes, inclusive o termo final, podem passar para o dia útil seguinte"}. Confira o ato e a prática do tribunal.</div>`);
+  for (const a of r.avisos) msgs.push(`<div class="msg alerta">${esc(a)}</div>`);
+  $("resultado").innerHTML = `<div class="datas">${c.join("")}</div><p class="hint" style="margin-top:10px">${esc(r.peca.nome)}: ${r.n} dias úteis, ${esc(r.peca.lei)}.</p>${msgs.length ? `<div class="msgs">${msgs.join("")}</div>` : ""}${tl(r)}`;
+  if (minutaVisivel) $("minuta").textContent = minuta(r);
+}
+
+// ---------- Selects dependentes do repositório ----------
+function tribunais() { const s = new Set(atos.map(a => a.tribunal).filter(Boolean)); if (!s.size) s.add("TJPE"); return [...s].sort(); }
+function preencheTribunais() {
+  for (const id of ["tribunal", "fTrib"]) {
+    const sel = $(id); const atual = sel.value;
+    sel.innerHTML = tribunais().map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join("");
+    if ([...sel.options].some(o => o.value === atual)) sel.value = atual;
+  }
+  preencheComarcas(); preencheAnos();
+}
+function preencheComarcas() {
+  const t = $("tribunal").value; const sel = $("comarca"); const atual = sel.value;
+  const set = new Map();
+  for (const a of atos) if (a.tribunal === t && a.abrangencia === "local") for (const c of (a.comarcas || [])) if (c.trim()) set.set(norm(c), c.trim());
+  const lista = [...set.values()].sort((a, b) => a.localeCompare(b, "pt-BR"));
+  const agreg = window.COMARCAS_AGREGADAS || {};
+  const todas = new Map(lista.map(c => [norm(c), c]));
+  for (const x of (window.FERIADOS_INDEFINIDOS || [])) if (x.tribunal === t && !todas.has(norm(x.comarca))) todas.set(norm(x.comarca), x.comarca);
+  const nomes = [...todas.values()].sort((a, b) => a.localeCompare(b, "pt-BR"));
+  sel.innerHTML = `<option value="__outra">Não informada ou sem feriados municipais cadastrados</option>` + nomes.map(c => `<option value="${esc(c)}">${esc(c)}${agreg[c] ? " (agregada à Comarca de " + esc(agreg[c]) + ")" : ""}</option>`).join("");
+  if ([...sel.options].some(o => o.value === atual)) sel.value = atual;
+}
+function preencheAnos() {
+  const t = $("fTrib").value; const sel = $("fAno"); const atual = sel.value;
+  const anos = [...new Set(atos.filter(a => a.tribunal === t).map(a => a.data.slice(0, 4)))].sort().reverse();
+  sel.innerHTML = `<option value="">Todos</option>` + anos.map(a => `<option value="${a}">${a}</option>`).join("");
+  if ([...sel.options].some(o => o.value === atual)) sel.value = atual;
+  else if (anos.includes("2026")) sel.value = "2026";
+}
+
+// ---------- Repositório: tabela ----------
+function abrangenciaTxt(a) {
+  if (a.abrangencia !== "local") return `<span class="chip">Todo o tribunal</span>`;
+  const p = [];
+  if (a.sede) p.push("Sede e 2ª instância");
+  if ((a.comarcas || []).length) p.push("Comarca: " + a.comarcas.join(", "));
+  return `<span class="chip">${esc(p.join(" · ") || "Local")}</span>`;
+}
+function renderRepo() {
+  if (!repoOk) { $("repoTabela").innerHTML = `<div class="vazio">O arquivo de atos (atos.js) não foi carregado. Confira se ele está na mesma pasta da página.</div>`; return; }
+  const t = $("fTrib").value, ano = $("fAno").value;
+  const lista = atos.filter(a => a.tribunal === t && (!ano || a.data.startsWith(ano))).sort((a, b) => a.data.localeCompare(b.data));
+  if (!lista.length) { $("repoTabela").innerHTML = `<div class="vazio">Nenhum ato cadastrado para este filtro.</div>`; return; }
+  const linhas = lista.map(a => `<tr>
+    <td class="dt">${plain(a.data)}</td><td>${DIAS[dow(a.data)]}</td><td>${esc(a.motivo)}</td>
+    <td>${abrangenciaTxt(a)}</td><td>${esc(refAto(a.dispositivo, a.ato))}${a.tipo === "parcial" ? `<br><span class="hint">Expediente parcial ou ponto facultativo: contado como dia útil, com alerta</span>` : ""}${a.municipal ? `<br><span class="hint">Lei municipal: ${a.lei ? esc(a.lei) : "não informada"}</span>` : ""}</td></tr>`).join("");
+  $("repoTabela").innerHTML = `<div class="tl-wrap"><table><thead><tr><th>Data</th><th>Dia</th><th>Motivo</th><th>Abrangência</th><th>Fundamento</th></tr></thead><tbody>${linhas}</tbody></table></div>`;
+}
+$("fTrib").addEventListener("change", () => { preencheAnos(); renderRepo(); });
+$("fAno").addEventListener("change", renderRepo);
+
+// ---------- Eventos do formulário ----------
+document.querySelectorAll("input[name=via], input[name=cit]").forEach(i => i.addEventListener("change", () => { atualizaPecas(); atualizar(); }));
+$("peca").addEventListener("change", () => { aplicaPeca(); atualizar(); });
+$("tribunal").addEventListener("change", () => { preencheComarcas(); atualizar(); });
+$("instancia").addEventListener("change", () => { const um = $("instancia").value === "1"; $("comarcaBox").hidden = !um; $("comarcaBox").style.display = um ? "grid" : "none"; $("hintSede").hidden = um; atualizar(); });
+$("temIndisp").addEventListener("change", () => { $("indispBox").hidden = !$("temIndisp").checked; $("indispBox").style.display = $("temIndisp").checked ? "grid" : "none"; if ($("temIndisp").checked && !$("indispList").children.length) addIndisp(); atualizar(); });
+$("addIndisp").addEventListener("click", () => { addIndisp(); atualizar(); });
+$("form").addEventListener("input", atualizar);
+$("form").addEventListener("change", atualizar);
+$("form").addEventListener("submit", e => e.preventDefault());
+$("docFields").addEventListener("input", () => { if (minutaVisivel && ultimo) $("minuta").textContent = minuta(ultimo); });
+$("gerar").addEventListener("click", () => { if (!ultimo) return; minutaVisivel = true; $("minuta").textContent = minuta(ultimo); $("minutaOut").hidden = false; $("gerar").textContent = "Atualizar minuta"; $("copiado").textContent = ""; });
+$("copiar").addEventListener("click", async () => {
+  const txt = $("minuta").textContent;
+  try { await navigator.clipboard.writeText(txt); $("copiado").textContent = "Texto copiado."; }
+  catch { const sel = window.getSelection(), rg = document.createRange(); rg.selectNodeContents($("minuta")); sel.removeAllRanges(); sel.addRange(rg); $("copiado").textContent = "Texto selecionado. Use Ctrl+C para copiar."; }
+});
+
+// ---------- Início ----------
+$("indispBox").style.display = "none";
+const fonte = Array.isArray(window.ATOS) ? window.ATOS : null;
+if (fonte) {
+  atos = fonte.filter(a => a && /^\d{4}-\d{2}-\d{2}$/.test(a.data) && a.tribunal)
+              .map(a => ({ abrangencia: "tribunal", sede: false, comarcas: [], ...a, tribunal: String(a.tribunal).trim().toUpperCase() }));
+  repoOk = true;
+  $("statusRepo").hidden = true;
+} else {
+  $("statusRepo").innerHTML = "<strong>O arquivo de atos (atos.js) não foi carregado.</strong> O cálculo considera apenas fins de semana e o recesso do art. 220 do CPC.";
+}
+atualizaPecas();
+preencheTribunais();
+$("dDisp").value = "2026-07-02";   // exemplo inicial
+$("peca").value = "apel"; aplicaPeca();
+atualizar();
+renderRepo();
+})();
+</script>
+
+</body>
+</html>
