@@ -303,7 +303,7 @@ const PECAS = [
     acao:"apresentação de réplica", sujeito:"A intimação para apresentação de réplica", gen:"f", fund:"arts. 350 e 351 do Código de Processo Civil", fecho:"Protocolada nesta data, é tempestiva a presente Réplica." },
   { id:"impcs", nome:"Impugnação ao Cumprimento de Sentença", grupo:"Primeira instância", vias:["djen"], dias:15, lei:"arts. 523 e 525 do CPC", preparo:false, modelo:true, docPub:true,
     acao:"apresentação da impugnação" },
-  { id:"cmand", nome:"Contestação", grupo:"Citação", vias:["mandado"], dias:15, lei:"art. 335, I, e art. 231, do CPC", preparo:false, modelo:true, acao:"apresentação da contestação" },
+  { id:"cmand", nome:"Contestação", grupo:"Citação", vias:["mandado"], dias:15, lei:"art. 335, III, e art. 231, II, do CPC", preparo:false, modelo:true, acao:"apresentação da contestação" },
   { id:"cdom",  nome:"Contestação", grupo:"Citação", vias:["domicilio"], dias:15, lei:"art. 231, IX, do CPC e art. 20, §3º-B, da Res. CNJ nº 455/2022", preparo:false, modelo:true, acao:"apresentação da contestação" },
   { id:"caud",  nome:"Contestação", grupo:"Citação", vias:["audiencia"], dias:15, lei:"art. 335, I, do CPC", preparo:false, modelo:true, acao:"apresentação da contestação" },
   { id:"eexm",  nome:"Embargos à Execução", grupo:"Citação", vias:["mandado"], dias:15, lei:"art. 915 e art. 231, II, do CPC", preparo:false, modelo:true, acao:"oposição dos presentes embargos" },
@@ -548,7 +548,7 @@ function minuta(r) {
       P.push(`Realizando-se a contagem estritamente em dias úteis, o termo final para o protocolo do recurso expira em ${fmt(r.fimOriginal)}` + comS(s, ", em razão da suspensão dos prazos processuais"));
       iTermo = P.length - 1;
       P.push(`Ademais, o preparo recursal demonstra-se efetivamente pago, conforme comprovante anexo (DOC. ${v("docPrep")}).`);
-      P.push(`Protocolado nesta data, mostra-se tempestiva o presente Agravo de Instrumento.`);
+      P.push(`Protocolado nesta data, mostra-se tempestivo o presente Agravo de Instrumento.`);
       break;
     }
     case "agint": {
@@ -622,7 +622,7 @@ function minuta(r) {
     }
     case "cmand": {
       const s = S(r.juntada);
-      P.push(`O prazo para apresentação de Contestação, nos termos art. 335, inciso I, combinado com o art. 231, inciso V, e art. 219, todos do Código de Processo Civil, é de ${ext(n)} dias úteis.`);
+      P.push(`O prazo para apresentação de Contestação, nos termos do art. 335, inciso III, combinado com o art. 231, inciso II, e art. 219, todos do Código de Processo Civil, é de ${ext(n)} dias úteis.`);
       P.push(`Dessa forma, a juntada do mandado ocorreu em ${fmt(r.juntada)}, de modo que o prazo para apresentação da presente contestação teve início em ${fmt(r.inicio)}, primeiro dia útil subsequente.`);
       P.push(`Realizando-se a contagem estritamente em dias úteis, o termo final para o protocolo da presente peça defensiva expira em ${fmt(r.fimOriginal)}` + comS(s, ", em razão da suspensão dos prazos processuais"));
       iTermo = P.length - 1;

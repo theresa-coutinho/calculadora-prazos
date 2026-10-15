@@ -1889,10 +1889,10 @@ window.ATOS = [
   { tribunal: "TJRR", data: "2026-12-07", motivo: "Ponto facultativo (véspera do Dia da Justiça)", ato: "Portaria TJRR/PR nº 1558/2025", dispositivo: "art. 3º e Anexo Único", abrangencia: "tribunal" },
   { tribunal: "TJRR", data: "2026-12-08", motivo: "Dia da Justiça e Nossa Senhora da Conceição", ato: "Portaria TJRR/PR nº 1558/2025", dispositivo: "art. 3º e Anexo Único", abrangencia: "tribunal" },
   // TJRS: Ato nº 05/2025-OE do Órgão Especial do TJRS (dias sem expediente em 2026)
-  //   Fonte: https://www.tjrs.jus.br/novo/noticia/aprovado-calendario-de-feriados-da-justica-estadual-para-2026/ (notícia oficial de 04/11/2025 com a tabela do ato). Texto do ato não lido (anexo da notícia indisponível); a minuta cita o ato sem dispositivo. Conferido em 13/10/2026.
+  //   Fonte: https://www.tjrs.jus.br/novo/noticia/aprovado-calendario-de-feriados-da-justica-estadual-para-2026/ (notícia oficial de 04/11/2025). Texto do ato (SEI 8614415, assinado em 21/10/2025) conferido em 14/10/2026; o ato não tem artigos, e a minuta o cita sem dispositivo.
+  //   Nota: dias de jogo do Brasil na Copa (Ordem de Serviço nº 003/2026-P) não cadastrados, por decisão da responsável em 14/10/2026.
   //   Nota: Pontos facultativos do Executivo não obrigam o Judiciário; 18/02, 01/04, 02/04, 20/04, 05/06, 10/08, 28/10 e 07/12 são dias úteis no TJRS.
   //   Nota: 02/02 e 04/06 são feriados municipais de Porto Alegre (sede do TJ e comarca da capital).
-  //   Nota: 24/06 e 29/06: dias de jogo do Brasil na Copa; prazos suspensos pela Ordem de Serviço nº 003/2026-P conforme reportagem, texto não lido. Cadastrados como parcial.
   //   Nota: Feriados municipais das comarcas do interior não cadastrados.
   { tribunal: "TJRS", data: "2026-02-02", motivo: "Nossa Senhora dos Navegantes (feriado municipal de Porto Alegre)", ato: "Ato nº 05/2025-OE do TJRS", dispositivo: "", abrangencia: "local", sede: true, comarcas: ["Porto Alegre"] },
   { tribunal: "TJRS", data: "2026-02-16", motivo: "Carnaval", ato: "Ato nº 05/2025-OE do TJRS", dispositivo: "", abrangencia: "tribunal" },
@@ -1901,8 +1901,6 @@ window.ATOS = [
   { tribunal: "TJRS", data: "2026-04-21", motivo: "Tiradentes", ato: "Ato nº 05/2025-OE do TJRS", dispositivo: "", abrangencia: "tribunal" },
   { tribunal: "TJRS", data: "2026-05-01", motivo: "Dia do Trabalho", ato: "Ato nº 05/2025-OE do TJRS", dispositivo: "", abrangencia: "tribunal" },
   { tribunal: "TJRS", data: "2026-06-04", motivo: "Corpus Christi (feriado municipal de Porto Alegre)", ato: "Ato nº 05/2025-OE do TJRS", dispositivo: "", abrangencia: "local", sede: true, comarcas: ["Porto Alegre"] },
-  { tribunal: "TJRS", data: "2026-06-24", motivo: "Jogo do Brasil na Copa: expediente reduzido e prazos suspensos (confira a Ordem de Serviço)", ato: "Ordem de Serviço nº 003/2026-P do TJRS", dispositivo: "", abrangencia: "tribunal", tipo: "parcial" },
-  { tribunal: "TJRS", data: "2026-06-29", motivo: "Jogo do Brasil na Copa: confira a Ordem de Serviço quanto à suspensão dos prazos", ato: "Ordem de Serviço nº 003/2026-P do TJRS", dispositivo: "", abrangencia: "tribunal", tipo: "parcial" },
   { tribunal: "TJRS", data: "2026-09-07", motivo: "Independência do Brasil", ato: "Ato nº 05/2025-OE do TJRS", dispositivo: "", abrangencia: "tribunal" },
   { tribunal: "TJRS", data: "2026-10-12", motivo: "Nossa Senhora Aparecida", ato: "Ato nº 05/2025-OE do TJRS", dispositivo: "", abrangencia: "tribunal" },
   { tribunal: "TJRS", data: "2026-11-02", motivo: "Finados", ato: "Ato nº 05/2025-OE do TJRS", dispositivo: "", abrangencia: "tribunal" },
@@ -2313,7 +2311,7 @@ window.ALERTAS_TRIBUNAIS = [
   {"tribunal": "TJPI", "texto": "TJPI: em 14/12/2026 (Dia do Ministério Público) não há audiências nem sessões com intervenção do MP, e os prazos do MP que começam ou terminam nessa data ficam prorrogados (Provimento nº 59/2025, art. 3º). Os feriados municipais das comarcas não estão cadastrados; confira os atos da Presidência para a comarca do processo."},
   {"tribunal": "TJRN", "texto": "TJRN: o calendário cadastrado é o da Portaria Conjunta nº 02/2026. Os feriados municipais não estão cadastrados; não há expediente forense nas comarcas com lei municipal de feriado (art. 1º, § 2º). Confira a lei municipal da comarca do processo."},
   {"tribunal": "TJRR", "texto": "TJRR: o calendário cadastrado é o da Portaria TJRR/PR nº 1558/2025. Confira no DJe eventuais alterações posteriores e, nos postos avançados de Caroebe e Iracema, os feriados locais (15/05 e 04/11)."},
-  {"tribunal": "TJRS", "texto": "TJRS: o calendário cadastrado é o do Ato nº 05/2025-OE. Pontos facultativos do Executivo não se aplicam. Os feriados municipais das comarcas do interior não estão cadastrados; confira a lei municipal da comarca do processo. Nos dias de jogo do Brasil na Copa (Ordem de Serviço nº 003/2026-P), confira a suspensão de prazos."},
+  {"tribunal": "TJRS", "texto": "TJRS: o calendário cadastrado é o do Ato nº 05/2025-OE. Pontos facultativos do Executivo não se aplicam. Os feriados municipais das comarcas do interior não estão cadastrados; confira a lei municipal da comarca do processo."},
   {"tribunal": "TJSC", "texto": "TJSC: o calendário cadastrado é o da Resolução GP nº 1/2026, que pode ter ajustes pontuais nas datas dos feriados municipais (art. 2º). Confira no DJe eventuais alterações e suspensões de expediente posteriores a janeiro."},
   {"tribunal": "TJSE", "texto": "TJSE: os pontos facultativos são declarados por Portaria Normativa da Presidência ao longo do ano. 07/12/2026 consta só como previsão no calendário. Os feriados municipais seguem o calendário do TJSE por município ou distrito; confira a comarca do processo."},
 ];
