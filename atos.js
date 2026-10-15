@@ -219,7 +219,7 @@ window.ATOS = [
   { tribunal: "TJPE", data: "2026-09-28", motivo: "Festival da Lavoura", ato: "Ato Conjunto nº 43/2025 do TJPE", dispositivo: "art. 4º", abrangencia: "local", sede: false, comarcas: ["Calçado"], municipal: true, lei: "" },
   // Camaragibe
   { tribunal: "TJPE", data: "2026-05-13", motivo: "Dia da Emancipação Política do Município", ato: "Ato Conjunto nº 43/2025 do TJPE", dispositivo: "art. 4º", abrangencia: "local", sede: false, comarcas: ["Camaragibe"], municipal: true, lei: "" },
-  { tribunal: "TJPE", data: "2026-06-10", motivo: "Dia do Padroeiro de Camaragibe – Sagrado Coração de Jesus", ato: "Ato Conjunto nº 43/2025 do TJPE", dispositivo: "art. 4º", abrangencia: "local", sede: false, comarcas: ["Camaragibe"], municipal: true, lei: "" },
+  { tribunal: "TJPE", data: "2026-06-10", motivo: "Dia do Padroeiro de Camaragibe (Sagrado Coração de Jesus)", ato: "Ato Conjunto nº 43/2025 do TJPE", dispositivo: "art. 4º", abrangencia: "local", sede: false, comarcas: ["Camaragibe"], municipal: true, lei: "" },
   // Camocim de São Félix
   { tribunal: "TJPE", data: "2026-05-18", motivo: "Dia de São Felix", ato: "Ato Conjunto nº 43/2025 do TJPE", dispositivo: "art. 4º", abrangencia: "local", sede: false, comarcas: ["Camocim de São Félix"], municipal: true, lei: "" },
   // Canhotinho
@@ -657,7 +657,7 @@ window.ATOS = [
   { tribunal: "TJPE", data: "2027-09-28", motivo: "Festival da Lavoura", ato: "Ato nº 1502/2026 do TJPE", dispositivo: "art. 5º", abrangencia: "local", sede: false, comarcas: ["Calçado"], municipal: true, lei: "" },
   // Camaragibe
   { tribunal: "TJPE", data: "2027-05-13", motivo: "Dia da Emancipação Política do Município", ato: "Ato nº 1502/2026 do TJPE", dispositivo: "art. 5º", abrangencia: "local", sede: false, comarcas: ["Camaragibe"], municipal: true, lei: "" },
-  { tribunal: "TJPE", data: "2027-06-10", motivo: "Dia do Padroeiro de Camaragibe – Sagrado Coração de Jesus", ato: "Ato nº 1502/2026 do TJPE", dispositivo: "art. 5º", abrangencia: "local", sede: false, comarcas: ["Camaragibe"], municipal: true, lei: "" },
+  { tribunal: "TJPE", data: "2027-06-10", motivo: "Dia do Padroeiro de Camaragibe (Sagrado Coração de Jesus)", ato: "Ato nº 1502/2026 do TJPE", dispositivo: "art. 5º", abrangencia: "local", sede: false, comarcas: ["Camaragibe"], municipal: true, lei: "" },
   // Camocim de São Félix
   { tribunal: "TJPE", data: "2027-05-18", motivo: "Dia de São Felix", ato: "Ato nº 1502/2026 do TJPE", dispositivo: "art. 5º", abrangencia: "local", sede: false, comarcas: ["Camocim de São Félix"], municipal: true, lei: "" },
   // Canhotinho
@@ -1798,6 +1798,34 @@ window.ATOS = [
   { tribunal: "TJRJ", data: "2026-11-02", motivo: "Finados", ato: "Lei nº 10.607/2002", dispositivo: "", abrangencia: "tribunal" },
   { tribunal: "TJRJ", data: "2026-11-20", motivo: "Dia Nacional de Zumbi e da Consciência Negra", ato: "Lei nº 14.759/2023", dispositivo: "", abrangencia: "tribunal" },
   { tribunal: "TJRJ", data: "2026-12-08", motivo: "Dia da Justiça", ato: "Lei Estadual nº 10.633/2024 do RJ", dispositivo: "art. 83, I", abrangencia: "tribunal" },
+  // TJRN: Portaria Conjunta nº 02, de 15 de janeiro de 2026, da Presidência e da Corregedoria-Geral de Justiça do TJRN
+  //   Fonte: DJe do TJRN nº 763, disponibilizado em 16/01/2026 (republicação por incorreção na edição nº 762). Cópia em files/atos-baixados.
+  //   Nota: o ato repete o inciso XIII (10/08 e 07/09) e não tem o inciso XVIII; os incisos foram citados como publicados.
+  //   Nota: os pontos facultativos (20/04, 04/06, 05/06, 29/06 e 30/10) contam como dia não útil, como no TJPB.
+  //   Nota: recesso de 20/12/2026 a 06/01/2027 (art. 1º, § 1º) já coberto pelo recesso fixo no código.
+  //   Nota: feriados municipais não cadastrados; sem expediente nas comarcas com lei municipal de feriado (art. 1º, § 2º).
+  { tribunal: "TJRN", data: "2026-02-16", motivo: "Carnaval", ato: "Portaria Conjunta nº 02/2026 do TJRN", dispositivo: "art. 1º, I", abrangencia: "tribunal" },
+  { tribunal: "TJRN", data: "2026-02-17", motivo: "Carnaval", ato: "Portaria Conjunta nº 02/2026 do TJRN", dispositivo: "art. 1º, II", abrangencia: "tribunal" },
+  { tribunal: "TJRN", data: "2026-02-18", motivo: "Quarta-feira de Cinzas", ato: "Portaria Conjunta nº 02/2026 do TJRN", dispositivo: "art. 1º, III", abrangencia: "tribunal" },
+  { tribunal: "TJRN", data: "2026-04-01", motivo: "Semana Santa", ato: "Portaria Conjunta nº 02/2026 do TJRN", dispositivo: "art. 1º, IV", abrangencia: "tribunal" },
+  { tribunal: "TJRN", data: "2026-04-02", motivo: "Semana Santa", ato: "Portaria Conjunta nº 02/2026 do TJRN", dispositivo: "art. 1º, V", abrangencia: "tribunal" },
+  { tribunal: "TJRN", data: "2026-04-03", motivo: "Semana Santa", ato: "Portaria Conjunta nº 02/2026 do TJRN", dispositivo: "art. 1º, VI", abrangencia: "tribunal" },
+  { tribunal: "TJRN", data: "2026-04-20", motivo: "Ponto facultativo", ato: "Portaria Conjunta nº 02/2026 do TJRN", dispositivo: "art. 1º, VII", abrangencia: "tribunal" },
+  { tribunal: "TJRN", data: "2026-04-21", motivo: "Tiradentes", ato: "Portaria Conjunta nº 02/2026 do TJRN", dispositivo: "art. 1º, VIII", abrangencia: "tribunal" },
+  { tribunal: "TJRN", data: "2026-05-01", motivo: "Dia do Trabalho", ato: "Portaria Conjunta nº 02/2026 do TJRN", dispositivo: "art. 1º, IX", abrangencia: "tribunal" },
+  { tribunal: "TJRN", data: "2026-06-04", motivo: "Ponto facultativo (Corpus Christi)", ato: "Portaria Conjunta nº 02/2026 do TJRN", dispositivo: "art. 1º, X", abrangencia: "tribunal" },
+  { tribunal: "TJRN", data: "2026-06-05", motivo: "Ponto facultativo", ato: "Portaria Conjunta nº 02/2026 do TJRN", dispositivo: "art. 1º, XI", abrangencia: "tribunal" },
+  { tribunal: "TJRN", data: "2026-06-29", motivo: "Dia de São Pedro", ato: "Portaria Conjunta nº 02/2026 do TJRN", dispositivo: "art. 1º, XII", abrangencia: "tribunal" },
+  { tribunal: "TJRN", data: "2026-08-10", motivo: "Antecipação do Dia do Advogado, do Dia do Magistrado e do Dia da Criação dos Cursos Jurídicos", ato: "Portaria Conjunta nº 02/2026 do TJRN", dispositivo: "art. 1º, XIII", abrangencia: "tribunal" },
+  { tribunal: "TJRN", data: "2026-09-07", motivo: "Independência do Brasil", ato: "Portaria Conjunta nº 02/2026 do TJRN", dispositivo: "art. 1º, XIII", abrangencia: "tribunal" },
+  { tribunal: "TJRN", data: "2026-10-12", motivo: "Nossa Senhora Aparecida", ato: "Portaria Conjunta nº 02/2026 do TJRN", dispositivo: "art. 1º, XIV", abrangencia: "tribunal" },
+  { tribunal: "TJRN", data: "2026-10-30", motivo: "Dia do Servidor Público", ato: "Portaria Conjunta nº 02/2026 do TJRN", dispositivo: "art. 1º, XV", abrangencia: "tribunal" },
+  { tribunal: "TJRN", data: "2026-11-02", motivo: "Finados", ato: "Portaria Conjunta nº 02/2026 do TJRN", dispositivo: "art. 1º, XVI", abrangencia: "tribunal" },
+  { tribunal: "TJRN", data: "2026-11-20", motivo: "Dia da Consciência Negra", ato: "Portaria Conjunta nº 02/2026 do TJRN", dispositivo: "art. 1º, XVII", abrangencia: "tribunal" },
+  { tribunal: "TJRN", data: "2026-12-07", motivo: "Antecipação do Dia da Justiça", ato: "Portaria Conjunta nº 02/2026 do TJRN", dispositivo: "art. 1º, XIX", abrangencia: "tribunal" },
+  { tribunal: "TJRN", data: "2026-12-24", motivo: "Véspera de Natal", ato: "Portaria Conjunta nº 02/2026 do TJRN", dispositivo: "art. 1º, XX", abrangencia: "tribunal" },
+  { tribunal: "TJRN", data: "2026-12-25", motivo: "Natal", ato: "Portaria Conjunta nº 02/2026 do TJRN", dispositivo: "art. 1º, XXI", abrangencia: "tribunal" },
+  { tribunal: "TJRN", data: "2026-12-31", motivo: "Véspera de Ano Novo", ato: "Portaria Conjunta nº 02/2026 do TJRN", dispositivo: "art. 1º, XXII", abrangencia: "tribunal" },
   // TJRO: Ato nº 2579/2025 do TJRO
   //   Fonte: https://atos.tjro.jus.br/detalhar/6114 (DJE n. 218, de 25/11/2025, p. 18-20; texto compilado de 03/08/2026)
   //   Nota: Anexo Único do Ato nº 2579/2025, alterado pelos Atos nº 2942/2025, 657/2026, 782/2026, 1255/2026 e 1720/2026. Conferido em 08/10/2026.
@@ -2283,6 +2311,7 @@ window.ALERTAS_TRIBUNAIS = [
   {"tribunal": "TJAM", "texto": "TJAM: o calendário cadastrado é o da Portaria nº 4704/2025. Confira no DJe eventuais alterações posteriores e os feriados municipais da comarca do processo."},
   {"tribunal": "TJGO", "texto": "TJGO: o calendário cadastrado é o divulgado pelo TJGO em 13/01/2026. A Presidência pode decretar outros pontos facultativos durante o ano. Confira os decretos judiciários posteriores e os feriados municipais da sede da comarca do processo."},
   {"tribunal": "TJPI", "texto": "TJPI: em 14/12/2026 (Dia do Ministério Público) não há audiências nem sessões com intervenção do MP, e os prazos do MP que começam ou terminam nessa data ficam prorrogados (Provimento nº 59/2025, art. 3º). Os feriados municipais das comarcas não estão cadastrados; confira os atos da Presidência para a comarca do processo."},
+  {"tribunal": "TJRN", "texto": "TJRN: o calendário cadastrado é o da Portaria Conjunta nº 02/2026. Os feriados municipais não estão cadastrados; não há expediente forense nas comarcas com lei municipal de feriado (art. 1º, § 2º). Confira a lei municipal da comarca do processo."},
   {"tribunal": "TJRR", "texto": "TJRR: o calendário cadastrado é o da Portaria TJRR/PR nº 1558/2025. Confira no DJe eventuais alterações posteriores e, nos postos avançados de Caroebe e Iracema, os feriados locais (15/05 e 04/11)."},
   {"tribunal": "TJRS", "texto": "TJRS: o calendário cadastrado é o do Ato nº 05/2025-OE. Pontos facultativos do Executivo não se aplicam. Os feriados municipais das comarcas do interior não estão cadastrados; confira a lei municipal da comarca do processo. Nos dias de jogo do Brasil na Copa (Ordem de Serviço nº 003/2026-P), confira a suspensão de prazos."},
   {"tribunal": "TJSC", "texto": "TJSC: o calendário cadastrado é o da Resolução GP nº 1/2026, que pode ter ajustes pontuais nas datas dos feriados municipais (art. 2º). Confira no DJe eventuais alterações e suspensões de expediente posteriores a janeiro."},
