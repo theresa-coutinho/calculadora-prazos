@@ -194,6 +194,7 @@ footer.nota { margin-top: 32px; font-size: 12px; color: var(--text-3); max-width
         <div id="datasCit" hidden>
           <label for="dCit" id="lblCit">Data da ciência no Domicílio Judicial Eletrônico</label>
           <input type="date" id="dCit">
+          <p class="hint" id="hintAud" hidden>Contagem válida apenas para audiência na Justiça Comum (art. 335, I, do CPC). Não se aplica aos Juizados Especiais.</p>
         </div>
       </div>
 
@@ -466,7 +467,10 @@ function calcular() {
     r.origem = c;
   } else {
     const j = $("dCit").value; if (!j) return null;
-    if (via === "audiencia") r.audiencia = j; else r.juntada = j;
+    if (via === "audiencia") {
+      r.audiencia = j;
+      avisos.push("Contagem válida apenas para audiência na Justiça Comum (art. 335, I, do CPC). Não se aplica aos Juizados Especiais.");
+    } else r.juntada = j;
     r.base = j;
     r.inicio = nextUtil(j, ctx);
     r.fim = addUtil(r.inicio, n - 1, ctx);
@@ -732,6 +736,7 @@ function atualizaPecas() {
   $("citGroup").hidden = djen;
   $("datasDjen").hidden = !djen; $("hintDjen").hidden = !djen;
   $("datasCit").hidden = djen;
+  $("hintAud").hidden = via !== "audiencia";
   $("lblCit").textContent = via === "mandado" ? "Data da juntada do mandado aos autos" : via === "audiencia" ? "Data da audiência de conciliação ou de mediação" : "Data da ciência no Domicílio Judicial Eletrônico";
 }
 function aplicaPeca() {
